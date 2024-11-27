@@ -1,10 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
+import { HttpClientModule } from '@angular/common/http';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AppComponent],
+      imports: [HttpClientModule, AppComponent], // Remove AppComponent from here
     }).compileComponents();
   });
 
@@ -14,16 +15,19 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have the 'my-lambda-app' title`, () => {
+  it(`should have the title 'my-lambda-app'`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
     expect(app.title).toEqual('my-lambda-app');
   });
 
-  it('should render title', () => {
+  it('should handle button click', () => {
     const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+    spyOn(app, 'onButtonClick');
+    const button = fixture.debugElement.nativeElement.querySelector('button');
+    button.click();
     fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, my-lambda-app');
+    expect(app.onButtonClick).toHaveBeenCalled();
   });
 });

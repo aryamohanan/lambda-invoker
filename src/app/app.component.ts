@@ -18,33 +18,35 @@ import { throwError } from 'rxjs';
 export class AppComponent {
   title = 'my-lambda-app';
   private lambdaUrl =
-    'https://dyjwjdhxbfcbxn33et7zfdjpnm0urzeh.lambda-url.us-east-2.on.aws';
+    'https://example.lambda-url.region.on.aws/';
 
-  constructor(private http: HttpClient) {}
+  constructor(private httpClient: HttpClient) {}
 
   onButtonClick(): void {
     const payload = { key: 'value' };
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'X-Amz-Invocation-Type': 'RequestResponse',
-      'X-Amz-Log-Type': 'Tail',
-    });
-
-    this.http
+    const headers = new HttpHeaders();
+    headers
+      .set('Content-Type', 'application/json')
+      .set('Access - Control - Allow - Origin', '*')
+      .set('X-Amz-Invocation-Type', 'RequestResponse')
+      .set('X-Amz-Log-Type', 'Tail');
+    this.httpClient
       .post(this.lambdaUrl, payload, { headers })
       .pipe(
         catchError((error: HttpErrorResponse) => {
           if (error.error instanceof ErrorEvent) {
-            // Client-side error
             console.error('An error occurred:', error.error.message);
+            alert('Lambda function response: ' + JSON.stringify(error));
           } else {
-            // Server-side error
             console.error(
               `Backend returned code ${error.status}, ` +
                 `body was: ${error.error}`
             );
+            alert(
+              `Backend returned code ${error.status}, ` +
+                `body was: ${JSON.stringify(error)}`
+            );
           }
-          // Return an observable with a user-facing error message
           return throwError('Something bad happened; please try again later.');
         })
       )
